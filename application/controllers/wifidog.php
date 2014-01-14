@@ -57,11 +57,69 @@ class Wifidog extends CI_Controller {
 		1.gw_id  来自wifidog 配置文件中，用来区分不同的路由设备
 		2.sys_uptime 路由器的系统启动时间
 		3.sys_memfree 系统内存使用百分比
-		4.wifidog_uptime wifidog持续运行时间（这个数据经常会有问题）		
+		4.wifidog_uptime wifidog持续运行时间（这个数据经常会有问题）
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		新增加参数
+		5.dev_id 设备id ，45位字符串（用来区分不同的设备）
+		6.cpu_usage cpu利用率，单位% 值0-100
+		7.nf_conntrack_num 系统会话数 值为整数
 		*/
 		
 		//返回值
-		echo 'Pong';
+		//规则返回值
+		$rule = ' result=';
+		
+		//主机、网段规则
+		$hostrule = array(
+					//一条主机规则：针对192.168.1.6单个ip，配置上行为10bps，下行为100bps的，会话数不限制的规则
+					array('ip'=>'192.168.1.6','netmask'=>'255.255.255.255','up'=>'10','down'=>'100','session'=>'0'),
+					//一条主机规则：针对192.168.1.9单个ip，配置上行不受限，下行为200bps的，会话数限制为200个的规则
+					array('ip'=>'192.168.1.9','netmask'=>'255.255.255.255','up'=>'0','down'=>'200','session'=>'200'),
+					//一条网段规则：针对192.168.1.0/24整个网段，配置该网段内的所有主机上行为20bps，下行为150bps的，会话数不限制的规则
+					array('ip'=>'192.168.1.0','netmask'=>'255.255.255.0','up'=>'20','down'=>'150','session'=>'0'),
+					//......其他规则
+					);
+		//注：按照先后顺序，1.6将按照第一条规则执行限速，1.9按照第二条规则限速，1.0网段其他ip将按照第三条规则限速
+		
+		//ip白名单
+		$ipwhite = array(
+						//添加1.2为不受限速限制的白名单
+						array('ip'=>'192.168.1.2','netmask'=>'255.255.255.255'),
+						//添加1.254为不受限速限制的白名单
+						array('ip'=>'192.168.1.254','netmask'=>'255.255.255.255'),
+						//..........
+					);
+		//注意：netmask也可以使用网段掩码，但是就相应的整个网段都是白名单，为了避免混淆，最好固定255.255.255.255不变
+		
+		//mac黑名单
+		//添加2个mac为mac黑名单，不能上网，不能dhcp获取ip
+		$macblack = array(array('mac'=>'aa:aa:aa:aa:aa , bb.bb.bb.bb.bb.bb'));
+		//注意：所有的mac地址要写在一个字符串里,中间用“,”号隔开
+		
+		//mac白名单
+		//添加2个mac为mac白名单，不用认证就能上网
+		$macwhite = array(array('mac'=>'cc.cc.cc.cc.cc.cc , dd.dd.dd.dd.dd.dd'));
+		//注意：所有的mac地址要写在一个字符串里,中间用“,”号隔开
+		
+		//域名白名单
+		//添加2个不用认证就能访问的域名
+		$domain = array(array('domain'=>'szshort.weixin.qq.com,www.apfree.net'));
+		//注意：所有的域名要写在一个字符串里,中间用“,”号隔开
+		
+		
+		//换算md5验证，必须要填写
+		$hostrule_md5 = $this->_json2md5str($hostrule);
+        $ipwhite_md5 = $this->_json2md5str($ipwhite);
+        $macblack_md5 = $this->_json2md5str($macblack);
+        $macwhite_md5 = $this->_json2md5str($macwhite);
+        $domain_md5 = $this->_json2md5str($domain);
+		
+		//拼接返回结果
+		$rule =$rule.json_encode(array('rule'=>array('host'=>$hostrule,'host_md5'=>$hostrule_md5,'ipwhite'=>$ipwhite,'ipwhite_md5'=>$ipwhite_md5,
+            'macblack'=>$macblack,'macblack_md5'=>$macblack_md5,'mackwhite'=>$macwhite,'mackwhite_md5'=>$macwhite_md5,
+            'domain'=>$domain,'domain_md5'=>$domain_md5)));
+		
+		echo 'Pong '.$rule;
 	}
 	
 	/**
@@ -85,6 +143,8 @@ class Wifidog extends CI_Controller {
 		2.gw_address wifidog状态的访问地址
 		3.gw_port 	wifidog状态的访问端口
 		4.url 		被重定向的url（用户访问的url）
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		5.dev_id 设备id，45位字符串（用来区分不同的设备）
 		
 		*/	
 		
@@ -155,6 +215,10 @@ class Wifidog extends CI_Controller {
 		4.incoming 下载流量
 		5.outgoing 上传流量 
 		6.stage  认证阶段，就两种 login 和 counters
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		7.dev_id 设备id，45位字符串（用来区分不同的设备）
+		8.uprate 该客户端该时刻即时上行速率，单位  bps
+		9.downrate 该客户端该时刻即时下行速率，单位  bps
 		*/
 		//做一个简单的流量判断验证，下载流量超值时，返回下线通知，否则保持在线
 		if(!empty($_GET['incoming']) and $_GET['incoming'] > 10000000)
@@ -184,6 +248,8 @@ class Wifidog extends CI_Controller {
 		/*
 			wifidog 带过来的参数 如下
 			1. gw_id
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			2.dev_id 设备id，45位字符串（用来区分不同的设备）
 		*/
 		
 		//重定到指定网站 或者 显示splash广告页面		
@@ -218,6 +284,20 @@ class Wifidog extends CI_Controller {
             //不回显任何信息
         }
     }
+	
+	
+	 /**
+      * 给规则数组换算md5 字符串
+      * 
+      * @param array  $arry
+      * 
+      * @return string md5字符串 
+      */
+     private function _json2md5str($arry=array())
+     {
+         //log_message('error','__json2md5str:'.json_encode($arry));
+         return md5(json_encode($arry));       
+     }
 }
 
 /* End of file wifidog.php */
