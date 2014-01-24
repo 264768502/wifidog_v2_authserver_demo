@@ -241,6 +241,7 @@ class Wifidog extends CI_Controller {
 		else
 			echo "Auth: 0"; //其他情况都返回拒绝
 			
+			
 		/*
 		返回值：主要有这两种就够了
 		0 - 拒绝
