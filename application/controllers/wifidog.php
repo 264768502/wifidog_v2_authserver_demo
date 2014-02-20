@@ -116,7 +116,7 @@ class Wifidog extends CI_Controller {
 		
 		//拼接返回结果
 		$rule =$rule.json_encode(array('rule'=>array('host'=>$hostrule,'host_md5'=>$hostrule_md5,'ipwhite'=>$ipwhite,'ipwhite_md5'=>$ipwhite_md5,
-            'macblack'=>$macblack,'macblack_md5'=>$macblack_md5,'mackwhite'=>$macwhite,'mackwhite_md5'=>$macwhite_md5,
+            'macblack'=>$macblack,'macblack_md5'=>$macblack_md5,'macwhite'=>$macwhite,'mackwhite_md5'=>$macwhite_md5,
             'domain'=>$domain,'domain_md5'=>$domain_md5)));
 		
 		echo 'Pong '.$rule;
