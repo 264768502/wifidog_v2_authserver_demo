@@ -59,7 +59,7 @@ class Wifidog extends CI_Controller {
 		3.sys_memfree 系统内存使用百分比
 		4.wifidog_uptime wifidog持续运行时间（这个数据经常会有问题）
 		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		新增加参数
+		v2新增加参数
 		5.dev_id 设备id ，45位字符串（用来区分不同的设备）
 		6.cpu_usage cpu利用率，单位% 值0-100
 		7.nf_conntrack_num 系统会话数 值为整数
@@ -144,8 +144,10 @@ class Wifidog extends CI_Controller {
 		3.gw_port 	wifidog状态的访问端口
 		4.url 		被重定向的url（用户访问的url）
 		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		协议v2新增参数
 		5.dev_id 设备id，45位字符串（用来区分不同的设备）
-		
+		接口v2.1.3新增加如下
+		6.mac 客户端的mac地址
 		*/	
 		
 		if ($this->form_validation->run() === FALSE)
@@ -216,9 +218,11 @@ class Wifidog extends CI_Controller {
 		5.outgoing 上传流量 
 		6.stage  认证阶段，就两种 login 和 counters
 		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		协议v2 新增如下参数
 		7.dev_id 设备id，45位字符串（用来区分不同的设备）
 		8.uprate 该客户端该时刻即时上行速率，单位  bps
 		9.downrate 该客户端该时刻即时下行速率，单位  bps
+		10.gw_id
 		*/
 		
 		
