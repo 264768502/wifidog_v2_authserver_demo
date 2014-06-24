@@ -63,6 +63,8 @@ class Wifidog extends CI_Controller {
 		5.dev_id 设备id ，45位字符串（用来区分不同的设备）
 		6.cpu_usage cpu利用率，单位% 值0-100
 		7.nf_conntrack_num 系统会话数 值为整数
+		8.out_rate 路由器出口（WAN口）的上行即时速率，单位 bps
+		9.in_rate 路由器出口（WAN口）的下行即时速率，单位 bps
 		*/
 		
 		//返回值
@@ -223,6 +225,7 @@ class Wifidog extends CI_Controller {
 		8.uprate 该客户端该时刻即时上行速率，单位  bps
 		9.downrate 该客户端该时刻即时下行速率，单位  bps
 		10.gw_id
+		11.client_name 客户端的设备名称，如果没有获取到，则用*表示
 		*/
 		
 		
