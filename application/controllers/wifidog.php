@@ -48,7 +48,7 @@ class Wifidog extends CI_Controller {
 		//判断各种参数是否为空
 		if( !(isset($_GET['gw_id']) and isset($_GET['sys_uptime']) and isset($_GET['sys_memfree']) and isset($_GET['sys_load']) and isset($_GET['wifidog_uptime']) ) )
 		{
-			echo '{"error":"2"}';
+			echo '{"error":"wifidog参数提交错误"}';
 			return;
 		}
 		//添加心跳日志处理功能
