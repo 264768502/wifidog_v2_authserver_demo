@@ -65,6 +65,7 @@ class Wifidog extends CI_Controller {
 		7.nf_conntrack_num 系统会话数 值为整数
 		8.out_rate 路由器出口（WAN口）的上行即时速率，单位 bps
 		9.in_rate 路由器出口（WAN口）的下行即时速率，单位 bps
+		10.(2014-08-07) online_devices 活跃主机数（包括通过认证和没有通过认证的、凡是连接到路由器上的设备的数量），
 		*/
 		
 		//返回值
